@@ -62,7 +62,7 @@ CREATE TABLE learns (
 
 
 -- Create canUse table
-CREATE TABLE canUse (
+CREATE TABLE prepared (
     charName VARCHAR(30),
     spellName VARCHAR(35),
     PRIMARY KEY (charName, spellName),
@@ -155,7 +155,7 @@ INSERT INTO learns (className, spellName, spellLvl) VALUES
 
 
 -- Insert character-to-spell relationships
-INSERT INTO canUse (charName, spellName) VALUES
+INSERT INTO prepared (charName, spellName) VALUES
 ('Gandalf', 'Fireball'),
 ('Gandalf', 'Magic Missile'),
 ('Gandalf', 'Shield'),
