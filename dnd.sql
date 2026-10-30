@@ -1,5 +1,5 @@
 -- Drop existing tables
-DROP TABLE IF EXISTS canUse;
+DROP TABLE IF EXISTS prepared;
 DROP TABLE IF EXISTS learns;
 DROP TABLE IF EXISTS invests;
 DROP TABLE IF EXISTS spell;
@@ -65,6 +65,7 @@ CREATE TABLE learns (
 CREATE TABLE prepared (
     charName VARCHAR(30),
     spellName VARCHAR(35),
+    spelllvl NUMERIC(1, 0),
     PRIMARY KEY (charName, spellName),
     FOREIGN KEY (charName) REFERENCES characters(name),
     FOREIGN KEY (spellName) REFERENCES spell(name)
