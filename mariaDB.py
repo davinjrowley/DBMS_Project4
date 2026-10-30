@@ -72,7 +72,6 @@ class MariaDB:
     def levelUp(self, char):
         #char = input("Enter character name: ")
     
-<<<<<<< HEAD
         self.cur.execute("SELECT lvl FROM characters WHERE name = %s", char)
     
         charLvl = self.cur.fetchone()[0]
@@ -93,19 +92,19 @@ class MariaDB:
                 print("Could not level up character: ", e)
             
 
-    def viewSpellbook(c):
+    def viewSpellbook(self, c):
         self.cur.execute("SELECT spellLvl, spellName FROM learns WHERE name = %s", c)
     
         records = self.cur.fetchall()
    
-    if records:
-        for record in records:
-            print(record)
-    else:
-        print("No record found.")
+        if records:
+            for record in records:
+                print(record)
+        else:
+            print("No record found.")
 
 
-    def viewOpenSlots(char):
+    def viewOpenSlots(self, char):
         try:
             self.cur.execute("SELECT castType FROM characters JOIN class ON characters.class = class.name WHERE name = %s ", char)
             castType = self.cur.fetchone()[0]
@@ -131,7 +130,7 @@ class MariaDB:
             print("Could not check open slots")
 
 
-    def learnSpell(char, spell):
+    def learnSpell(self, char, spell):
         
         try:
             # Check to see if that spell is in spell list.
@@ -168,7 +167,7 @@ class MariaDB:
         except pymysql.MYSQLError as e:
             print("Could not add spell!")
             
-    def unPrepare(char, spell):
+    def unPrepare(self, char, spell):
         try:
             self.cur.execute(
                 "SELECT charName FROM `prepared` WHERE name = %s",
@@ -197,7 +196,3 @@ class MariaDB:
         except pymysql.MySQLError as e:
             self.conn.rollback()
             print("Could not unprepare spell:", e)
- 
-    def closeConnection():
-        self.cur.close()
-        self.conn.close()
