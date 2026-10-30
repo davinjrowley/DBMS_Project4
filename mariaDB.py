@@ -15,9 +15,7 @@ class MariaDB:
         self.cur.close()
         self.conn.close()
 
-    def lookUp(self):
-        x = input("Enter a name: ")
-        y = input("Enter a table: ")
+    def lookUp(self, x, y):
     
         tables = {"class", "characters", "spell"}
     
@@ -37,8 +35,7 @@ class MariaDB:
         else:
             print("No record found.")
 
-    def createCharacter(self):
-        name = input("Enter your character's name: ")
+    def createCharacter(self, name):
     
         try:
             lvl = int(input("Enter your level: "))
