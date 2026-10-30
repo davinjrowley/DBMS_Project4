@@ -116,7 +116,7 @@ INSERT INTO slotProgression (castType, playerLvl, lvl1, lvl2, lvl3, lvl4, lvl5) 
 ('Half', 20, 4, 3, 3, 3, 2, 0, 0, 0, 0);
 
 -- Insert sample classes
-INSERT INTO class (name, description) VALUES
+INSERT INTO class (name, description, castType) VALUES
 ('Wizard', 'Arcane spellcaster', 'Full'),
 ('Cleric', 'Divine spellcaster' 'Full'),
 ('Bard', 'Magical performer', 'Full'),
