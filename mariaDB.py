@@ -60,11 +60,9 @@ def createCharacter():
             print("Invalid class")
             return
 
-        query1 = "INSERT INTO characters (name, lvl) VALUES (%s, %s)"
-        query2 = "INSERT INTO invests (charName, className) VALUES (%s, %s)"
+        query1 = "INSERT INTO characters (name, lvl, class) VALUES (%s, %s, %s)"
 
-        cur.execute(query1, (name, lvl))
-        cur.execute(query2, (name, className))
+        cur.execute(query1, (name, lvl, className))
 
         conn.commit()
         print("Character created successfully")
@@ -72,6 +70,62 @@ def createCharacter():
     except pymysql.MySQLError as e:
         conn.rollback()
         print("Could not create character:", e)
+
+def levelUp(char):
+    #char = input("Enter character name: ")
+    
+    cur.execute("SELECT lvl FROM characters WHERE name = %s", char)
+    
+    charLvl = cur.fetchone()[0]
+    
+    if (charLvl == 20):
+        print(f"{char} is at maximum level!")
+    else:
+        try:
+            # Update characters to have lvl + 1
+            query1 = "UPDATE characters SET lvl = lvl + 1 WHERE name = %s"
+            
+            cur.execute(query1, (char,))
+            
+            
+            # Updates invests to have their class specifics
+            # Has to check if the Wait we may not need this
+            """
+            cur.execute("SELECT class FROM characters WHERE name = %s", char)
+            charClass = cur.fetchone()[0]
+            
+            cur.execute("SELECT castType FROM class WHERE name = %s", charClass)
+            castType = cur.fetchone()[0]
+            
+            """
+            
+        except pymysql.MYSQLError as e:
+            conn.rollback()
+            print("Could not level up character: ", e)
+            
+
+def viewSpellbook(c):
+    cur.execute("SELECT spellLvl, spellName FROM learns WHERE name = %s", c)
+    
+    records = cur.fetchall()
+   
+    if records:
+        for record in records:
+            print(record)
+    else:
+        print("No record found.")
+    
+
+def learnSpell(char, spell):
+    """
+    char = input("Enter character name: ")
+    
+    spell = input("Enter desired spell: ")
+    """
+        
+
+
+
     
 cur.close()
 conn.close()
