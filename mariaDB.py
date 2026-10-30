@@ -88,17 +88,7 @@ def levelUp(char):
             cur.execute(query1, (char,))
             
             
-            # Updates invests to have their class specifics
-            # Has to check if the Wait we may not need this
-            """
-            cur.execute("SELECT class FROM characters WHERE name = %s", char)
-            charClass = cur.fetchone()[0]
-            
-            cur.execute("SELECT castType FROM class WHERE name = %s", charClass)
-            castType = cur.fetchone()[0]
-            
-            """
-            
+            conn.commit()
         except pymysql.MYSQLError as e:
             conn.rollback()
             print("Could not level up character: ", e)
@@ -114,15 +104,70 @@ def viewSpellbook(c):
             print(record)
     else:
         print("No record found.")
-    
+
+
+def viewOpenSlots(char):
+    try:
+        cur.execute("SELECT castType FROM characters JOIN class ON characters.class = class.name WHERE name = %s ", char)
+        castType = cur.fetchone()[0]
+        
+        if castType = "Full":
+            cur.execute("SELECT lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9 FROM slotProgression WHERE castType = %s", castType)
+        else:
+            # is a half caster
+            cur.execute("SELECT lvl1, lvl2, lvl3, lvl4, lvl5 FROM slotProgression WHERE castType = %s", castType)
+
+        slots = cur.fetchall()
+        
+        lvl = 1
+        
+        for slotLvl in slots:
+            cur.execute("SELECT * FROM prepared WHERE charName = %s AND spelllvl = %s", char, slots)
+            used = len(cur.fetchall())
+            slotLvl = slotLvl - used
+            print("Lvl " + lvl + ": " + slotLvl)
+            lvl += 1
+
+    except pymysql.MYSQLError as e:
+        print("Could not check open slots")
+
 
 def learnSpell(char, spell):
-    """
-    char = input("Enter character name: ")
     
-    spell = input("Enter desired spell: ")
-    """
+    try:
+        # Check to see if that spell is in spell list.
+        cur.execute("SELECT lvl, class, castType FROM characters JOIN class ON characters.class = class.name WHERE name = %s ", char)
+    
+        charClass = cur.fetchone()[0]
+        charLvl = cur.fetchone()[1]
+        charCastType = cur.fetchone()[2]
+    
+        cur.execute("SELECT spellName FROM learns WHERE className = %s", charClass)
         
+        if (cur.fetchone()[0] is not None):
+            # Check if the character has an open slot of that level
+            cur.execute("SELECT spellLvl FROM learns WHERE spellName = %s", spell)
+            spellLvl = cur.fetchone()[0]
+
+            cur.execute("SELECT * FROM prepared WHERE charName = %s AND spellLvl = %s", char, spellLvl)
+            spellsOfLvl = cur.fetchall()
+
+            cur.execute("SELECT lvl%s FROM slotProgression WHERE playerLvl = %s AND castType = %s", spellLvl, lvl, charCastType)
+
+            if len(spellsOfLvl) >= cur.fetchone()[0]:
+                print("You have already prepared your maximum of " + spellLvl + " spell slots! Please forget a spell and try again.")
+                return
+            else:
+                cur.execute("INSERT INTO prepared (charName, spellName, spelllvl) VALUES (%s, %s, %s)", char, spell, spellLvl)
+                
+            conn.commit()
+            print("Spell added!")
+        else:
+            conn.rollback()
+            print("You can not learn that spell!")
+        
+    except pymysql.MYSQLError as e:
+        print("Could not add spell!")
 
 
 
