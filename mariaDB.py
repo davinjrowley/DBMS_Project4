@@ -1,4 +1,5 @@
 
+from typing import Self
 import pymysql
 
 class MariaDB:
@@ -24,10 +25,10 @@ class MariaDB:
            return
 
         query = f"SELECT * FROM {y} WHERE name = %s"
-        cur.execute(query, (x,))
+        self.cur.execute(query, (x,))
         #comma is the cause it needs to be a tuple even when there is only one input
     
-        records = cur.fetchall()
+        records = self.cur.fetchall()
    
         if records:
             for record in records:
@@ -48,29 +49,30 @@ class MariaDB:
             return
 
         try:
-            cur.execute(
+            self.cur.execute(
                 "SELECT name FROM `class` WHERE name = %s",
                 (className,)
             )
 
-            if cur.fetchone() is None:
+            if self.cur.fetchone() is None:
                 print("Invalid class")
                 return
 
             query1 = "INSERT INTO characters (name, lvl, class) VALUES (%s, %s, %s)"
 
-            cur.execute(query1, (name, lvl, className))
+            self.cur.execute(query1, (name, lvl, className))
 
-            conn.commit()
+            self.conn.commit()
             print("Character created successfully")
 
         except pymysql.MySQLError as e:
-            conn.rollback()
+            self.conn.rollback()
             print("Could not create character:", e)
 
     def levelUp(self, char):
         #char = input("Enter character name: ")
     
+<<<<<<< HEAD
         self.cur.execute("SELECT lvl FROM characters WHERE name = %s", char)
     
         charLvl = self.cur.fetchone()[0]
