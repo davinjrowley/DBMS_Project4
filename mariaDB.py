@@ -123,6 +123,35 @@ def learnSpell(char, spell):
     spell = input("Enter desired spell: ")
     """
         
+def unPrepare(char, spell):
+    try:
+        cur.execute(
+            "SELECT charName FROM `prepared` WHERE name = %s",
+            (char,)
+        )
+
+        if cur.fetchone() is None:
+            print("Invalid character")
+            return
+
+        cur.execute("SELECT spellName FROM `prepared` WHERE spellName = %s",
+            (spell,)
+        )
+
+        if cur.fetchone() is None:
+            print("Invalid spell")
+            return
+
+        query1 = "DELETE FROM `prepared` WHERE charName = %s AND spellName = %s"
+
+        cur.execute(query1, (char, spell))
+
+        conn.commit()
+        print("Spell unprepared successfully")
+
+    except pymysql.MySQLError as e:
+        conn.rollback()
+        print("Could not unprepare spell:", e)
 
 
 
