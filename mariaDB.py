@@ -35,15 +35,13 @@ class MariaDB:
         else:
             print("No record found.")
 
-    def createCharacter(self, name):
+    def createCharacter(self, name, lvl, className):
     
         try:
-            lvl = int(input("Enter your level: "))
+            lvl = int(lvl)
         except ValueError:
             print("Invalid level. Enter a whole number.")
             return
-    
-        className = input("Enter your class: ")
     
         if lvl < 1 or lvl > 20:
             print("Invalid level")
