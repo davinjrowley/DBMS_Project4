@@ -34,8 +34,8 @@ CREATE TABLE spell (
 
 -- Create slotProgression table
 CREATE TABLE slotProgression (
-    castType VARCHAR(10) PRIMARY KEY,
-    playerLvl NUMERIC(2,0) CHECK (playerLvl BETWEEN 1 AND 20) PRIMARY KEY,
+    castType VARCHAR(10),
+    playerLvl NUMERIC(2,0) CHECK (playerLvl BETWEEN 1 AND 20),
     lvl1 NUMERIC(1, 0),
     lvl2 NUMERIC(1, 0),
     lvl3 NUMERIC(1, 0),
@@ -44,7 +44,8 @@ CREATE TABLE slotProgression (
     lvl6 NUMERIC(1, 0),
     lvl7 NUMERIC(1, 0),
     lvl8 NUMERIC(1, 0),
-    lvl9 NUMERIC(1, 0)
+    lvl9 NUMERIC(1, 0),
+    PRIMARY KEY (castType, playerLvl)
 );
 
 
