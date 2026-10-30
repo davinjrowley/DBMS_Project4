@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS invests;
 DROP TABLE IF EXISTS spell;
 DROP TABLE IF EXISTS characters;
 DROP TABLE IF EXISTS class;
+DROP TABLE IF EXISTS slotProgression;
 
 
 -- Create class table
