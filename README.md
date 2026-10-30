@@ -2,9 +2,9 @@
 
 ## Schema
 
-- Classes(**name**, description)
-- Character(**name**, lvl, openSlots)
-- Spell(**name**, lvl, school, description)
-- invests(**charName**, className, subclass, lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9)
+- class(**name**, description, castType)
+- characters(**name**, lvl, class)
+- spell(**name**, lvl, school, description)
+- slotProgression(**castType**, **playerLvl**, lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9)
 - learns(**className**, spellName, spellLvl)
-- prepared(**charName**, spellName)
+- prepared(**charName**, spellName, spelllvl)
