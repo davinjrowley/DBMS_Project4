@@ -1,4 +1,5 @@
 
+from typing import Self
 import pymysql
 
 class MariaDB:
@@ -24,10 +25,10 @@ class MariaDB:
            return
 
         query = f"SELECT * FROM {y} WHERE name = %s"
-        cur.execute(query, (x,))
+        self.cur.execute(query, (x,))
         #comma is the cause it needs to be a tuple even when there is only one input
     
-        records = cur.fetchall()
+        records = self.cur.fetchall()
    
         if records:
             for record in records:
@@ -48,24 +49,24 @@ class MariaDB:
             return
 
         try:
-            cur.execute(
+            self.cur.execute(
                 "SELECT name FROM `class` WHERE name = %s",
                 (className,)
             )
 
-            if cur.fetchone() is None:
+            if self.cur.fetchone() is None:
                 print("Invalid class")
                 return
 
             query1 = "INSERT INTO characters (name, lvl, class) VALUES (%s, %s, %s)"
 
-            cur.execute(query1, (name, lvl, className))
+            self.cur.execute(query1, (name, lvl, className))
 
-            conn.commit()
+            self.conn.commit()
             print("Character created successfully")
 
         except pymysql.MySQLError as e:
-            conn.rollback()
+            self.conn.rollback()
             print("Could not create character:", e)
 
 def levelUp(self, char):
@@ -97,14 +98,14 @@ def levelUp(self, char):
             """
             
         except pymysql.MYSQLError as e:
-            conn.rollback()
+            self.conn.rollback()
             print("Could not level up character: ", e)
             
 
     def viewSpellbook(c):
-        cur.execute("SELECT spellLvl, spellName FROM learns WHERE name = %s", c)
+        self.cur.execute("SELECT spellLvl, spellName FROM learns WHERE name = %s", c)
     
-        records = cur.fetchall()
+        records = self.cur.fetchall()
    
         if records:
             for record in records:
@@ -122,34 +123,34 @@ def levelUp(self, char):
         
     def unPrepare(char, spell):
         try:
-            cur.execute(
+            self.cur.execute(
                 "SELECT charName FROM `prepared` WHERE name = %s",
                 (char,)
             )
 
-            if cur.fetchone() is None:
+            if self.cur.fetchone() is None:
                 print("Invalid character")
                 return
 
-            cur.execute("SELECT spellName FROM `prepared` WHERE spellName = %s",
+            self.cur.execute("SELECT spellName FROM `prepared` WHERE spellName = %s",
                 (spell,)
             )
 
-            if cur.fetchone() is None:
+            if self.cur.fetchone() is None:
                 print("Invalid spell")
                 return
 
             query1 = "DELETE FROM `prepared` WHERE charName = %s AND spellName = %s"
 
-            cur.execute(query1, (char, spell))
+            self.cur.execute(query1, (char, spell))
 
-            conn.commit()
+            self.conn.commit()
             print("Spell unprepared successfully")
 
         except pymysql.MySQLError as e:
-            conn.rollback()
+            self.conn.rollback()
             print("Could not unprepare spell:", e)
  
     def closeConnection():
-        cur.close()
-        conn.close()
+        self.cur.close()
+        self.conn.close()
