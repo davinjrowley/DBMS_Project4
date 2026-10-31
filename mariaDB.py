@@ -93,7 +93,7 @@ class MariaDB:
             
 
     def viewSpellbook(self, c):
-        self.cur.execute("SELECT spellLvl, spellName FROM learns WHERE name = %s", c)
+        self.cur.execute("SELECT spellLvl, spellName FROM learns WHERE className = %s", c)
     
         records = self.cur.fetchall()
    
