@@ -87,7 +87,7 @@ class MariaDB:
                 
                 
                 self.conn.commit()
-            except pymysql.MYSQLError as e:
+            except pymysql.MySQLError as e:
                 self.conn.rollback()
                 print("Could not level up character: ", e)
             
@@ -106,43 +106,96 @@ class MariaDB:
 
     def viewOpenSlots(self, char):
         try:
-            self.cur.execute("SELECT castType FROM characters JOIN class ON characters.class = class.name WHERE name = %s ", (char,))
-            castType = self.cur.fetchone()[0]
-            
+            self.cur.execute(
+                """SELECT castType FROM characters
+                JOIN class ON characters.class = class.name
+                WHERE characters.name = %s""",
+                (char,)
+            )
+
+            result = self.cur.fetchone()
+
+            if result is None:
+                print("Character not found!")
+                return
+
+            castType = result[0]
+
+            self.cur.execute(
+                "SELECT lvl FROM characters WHERE name = %s",
+                (char,)
+            )
+            charLvl = self.cur.fetchone()[0]
+
             if castType == "Full":
-                self.cur.execute("SELECT lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9 FROM slotProgression WHERE castType = %s", castType)
+                self.cur.execute(
+                    """SELECT lvl1, lvl2, lvl3, lvl4, lvl5,
+                          lvl6, lvl7, lvl8, lvl9
+                   FROM slotProgression
+                   WHERE playerLvl = %s AND castType = %s""",
+                (charLvl, castType)
+            )
             else:
-                # is a half caster
-                self.cur.execute("SELECT lvl1, lvl2, lvl3, lvl4, lvl5 FROM slotProgression WHERE castType = %s", (castType,))
+                self.cur.execute(
+                """SELECT lvl1, lvl2, lvl3, lvl4, lvl5
+                   FROM slotProgression
+                   WHERE playerLvl = %s AND castType = %s""",
+                (charLvl, castType)
+            )
 
-            slots = self.cur.fetchall()
-            
-            lvl = 1
-            
-            for slotLvl in slots:
-                self.cur.execute("SELECT * FROM prepared WHERE charName = %s AND spelllvl = %s", (char, slots))
-                used = len(self.cur.fetchall())
-                slotLvl = slotLvl - used
-                print("Lvl " + lvl + ": " + slotLvl)
-                lvl += 1
+            slots = self.cur.fetchone()
 
-        except pymysql.MYSQLError as e:
-            print("Could not check open slots")
+            if slots is None:
+                print("No slot progression found!")
+                return
+
+            for lvl, slotLvl in enumerate(slots, start=1):
+                if slotLvl is None:
+                    slotLvl = 0
+
+                self.cur.execute(
+                    """SELECT COUNT(*) FROM prepared
+                   WHERE charName = %s AND spellLvl = %s""",
+                (char, lvl)
+                )
+
+                used = self.cur.fetchone()[0]
+                remaining = slotLvl - used
+
+                print(f"Level {lvl}: {remaining} slots remaining")
+
+        except pymysql.MySQLError as e:
+            print("Could not check open slots:", e)
 
 
     def learnSpell(self, char, spell):
         
         try:
             # Check to see if that spell is in spell list.
-            self.cur.execute("SELECT lvl, class, castType FROM characters JOIN class ON characters.class = class.name WHERE name = %s ", (char,))
+            self.cur.execute("SELECT lvl, class, castType FROM characters JOIN class ON characters.class = class.name WHERE characters.name = %s ", (char,))
         
-            charClass = self.cur.fetchone()[0]
-            charLvl = self.cur.fetchone()[1]
-            charCastType = self.cur.fetchone()[2]
+            result = self.cur.fetchone()
+
+            if result is None:
+                print("Character not found.")
+                return
+
+            charLvl, charClass, charCastType = result
         
-            self.cur.execute("SELECT spellName FROM learns WHERE className = %s", (charClass,))
+            self.cur.execute(
+            "SELECT spellLvl FROM learns WHERE className = %s AND spellName = %s",
+            (charClass, spell)
+            )
+
+            spellResult = self.cur.fetchone()
+
+            if spellResult is None:
+                print("You cannot learn that spell!")
+                return
+
+            spellLvl = spellResult[0]
             
-            if (self.cur.fetchone()[0] is not None):
+            if (spellLvl is not None):
                 # Check if the character has an open slot of that level
                 self.cur.execute("SELECT spellLvl FROM learns WHERE spellName = %s", (spell,))
                 spellLvl = self.cur.fetchone()[0]
@@ -150,13 +203,18 @@ class MariaDB:
                 self.cur.execute("SELECT * FROM prepared WHERE charName = %s AND spellLvl = %s", (char, spellLvl))
                 spellsOfLvl = self.cur.fetchall()
 
-                self.cur.execute("SELECT lvl%s FROM slotProgression WHERE playerLvl = %s AND castType = %s", (spellLvl, lvl, charCastType))
+                slotColumn = f"lvl{spellLvl}"
+
+                self.cur.execute(
+                    f"SELECT `{slotColumn}` FROM slotProgression WHERE playerLvl = %s AND castType = %s",
+                    (charLvl, charCastType)
+                )
 
                 if len(spellsOfLvl) >= self.cur.fetchone()[0]:
                     print("You have already prepared your maximum of " + spellLvl + " spell slots! Please forget a spell and try again.")
                     return
                 else:
-                    cur.execute("INSERT INTO prepared (charName, spellName, spelllvl) VALUES (%s, %s, %s)", (char, spell, spellLvl))
+                    self.cur.execute("INSERT INTO prepared (charName, spellName, spelllvl) VALUES (%s, %s, %s)", (char, spell, spellLvl))
                     
                 self.conn.commit()
                 print("Spell added!")
@@ -164,13 +222,13 @@ class MariaDB:
                 self.conn.rollback()
                 print("You can not learn that spell!")
             
-        except pymysql.MYSQLError as e:
+        except pymysql.MySQLError as e:
             print("Could not add spell!")
             
     def unPrepare(self, char, spell):
         try:
             self.cur.execute(
-                "SELECT charName FROM `prepared` WHERE name = %s",
+                "SELECT charName FROM `prepared` WHERE charName = %s",
                 (char,)
             )
 
