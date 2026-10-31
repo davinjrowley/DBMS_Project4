@@ -93,7 +93,7 @@ class MariaDB:
             
 
     def viewSpellbook(self, c):
-        self.cur.execute("SELECT spellLvl, spellName FROM learns WHERE name = %s", (c,))
+        self.cur.execute("SELECT spellLvl, spellName FROM learns WHERE className = %s", c)
     
         records = self.cur.fetchall()
    
@@ -109,8 +109,8 @@ class MariaDB:
             self.cur.execute("SELECT castType FROM characters JOIN class ON characters.class = class.name WHERE name = %s ", (char,))
             castType = self.cur.fetchone()[0]
             
-            if castType = "Full":
-                self.cur.execute("SELECT lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9 FROM slotProgression WHERE castType = %s", (castType,))
+            if castType == "Full":
+                self.cur.execute("SELECT lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9 FROM slotProgression WHERE castType = %s", castType)
             else:
                 # is a half caster
                 self.cur.execute("SELECT lvl1, lvl2, lvl3, lvl4, lvl5 FROM slotProgression WHERE castType = %s", (castType,))
