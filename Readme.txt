@@ -16,3 +16,8 @@ Step 5.)
     have fun :)
 
 *Note: We didn't know how to parameterize the connection variables so we just inputted your MariaDB connection for your build 
+*Note: The current classes supported are:
+	- Bard
+	- Cleric
+	- Paladin
+	- Wizard
