@@ -32,7 +32,7 @@ def main():
             db.learnSpell(char, spell)
         elif usr_inp == "view spell slots":
             char = input("What is the name of your character: ")
-            db.viewSpellSlots(char)
+            db.viewOpenSlots(char)
         elif usr_inp == "unprepare":
             char = input("What is the name of your character: ")
             spell = input("What is the name of the spell: ")
